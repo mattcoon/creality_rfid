@@ -60,7 +60,7 @@ def read_uid_from_tag():
     try:
         # Run hf 14a reader command to get UID
         result = subprocess.run(
-            [pm3_cmd, '-c', 'hf 14a reader'],
+            [pm3_cmd, '-c', 'hf mf info'],
             capture_output=True,
             text=True,
             timeout=10
@@ -473,7 +473,7 @@ def print_color_table():
         ('0FF69B4', 'HotPink'),
         ('0FF1493', 'DeepPink'),
         ('0C71585', 'MediumTurquoise'),
-        ('00CED1', 'DarkTurquoise'),
+        ('000CED1', 'DarkTurquoise'),
         ('000FA9A', 'DarkCyan'),
         ('048D1CC', 'DeepSkyBlue'),
         ('01E90FF', 'DodgerBlue'),
