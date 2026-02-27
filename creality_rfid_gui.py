@@ -4,6 +4,7 @@ Creality RFID Tool - GUI Application
 User-friendly interface for reading and writing RFID tags
 """
 
+from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox, colorchooser
 import subprocess
@@ -15,7 +16,7 @@ class CrealityRFIDGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Creality RFID Tool")
-        self.root.geometry("900x700")
+        self.root.geometry("1524x720")
         
         # Get script path
         self.script_path = self.find_script()
@@ -228,8 +229,13 @@ class CrealityRFIDGUI:
         row += 1
         
         # Date
+        # get current date in YYMDD format
+        current_date = datetime.now().strftime("%y%m%d")
+        #convert to YYMDD by removing the first character of the month and using base 16 to convert it to a single character
+        month_char = hex(int(current_date[2:4]))[2:].upper()  # Convert to hex and remove '0x', then uppercase
+        current_date = current_date[:2] + month_char + current_date[4:]
         ttk.Label(left_frame, text="Date (YYMDD):").grid(row=row, column=0, sticky=tk.W, pady=5)
-        self.date_var = tk.StringVar(value='24120')
+        self.date_var = tk.StringVar(value=current_date)
         ttk.Entry(left_frame, textvariable=self.date_var, width=15).grid(row=row, column=1, sticky=tk.W, pady=5)
         row += 1
         
