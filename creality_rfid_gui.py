@@ -71,16 +71,16 @@ class CrealityRFIDGUI:
         
         # Color presets
         self.color_presets = {
-            'Red': '0FF0000',
+            'White': '0FFFFFF',
+            'Black': '0000000',
+            'Red':   '0FF0000',
             'Green': '000FF00',
-            'Blue': '00000FF',
+            'Blue':  '00000FF',
             'Yellow': '0FFFF00',
             'Orange': '0FFA500',
             'Purple': '0800080',
-            'Pink': '0FFC0CB',
-            'White': '0FFFFFF',
-            'Black': '0000000',
-            'Gray': '0808080',
+            'Pink':  '0FFC0CB',
+            'Gray':  '0808080',
         }
         
         # Create UI
@@ -143,6 +143,11 @@ class CrealityRFIDGUI:
         self.create_reference_tab()
         self.create_manual_tab()
         
+    def on_color_entry_change(self, *args):
+        color = self.color_var.get()
+        if len(color) == 7 and color.startswith('0'):
+            self.color_preview.config(bg='#'+color[1:])        
+     
     def create_write_tab(self):
         """Create Write Tag tab"""
         write_frame = ttk.Frame(self.notebook)
@@ -172,11 +177,12 @@ class CrealityRFIDGUI:
         color_frame.grid(row=row, column=1, sticky=tk.W, pady=5)
         
         self.color_var = tk.StringVar(value='00000FF')
+        self.color_var.trace_add("write", self.on_color_entry_change)
         self.color_entry = ttk.Entry(color_frame, textvariable=self.color_var, width=10)
         self.color_entry.pack(side=tk.LEFT, padx=(0, 5))
         
         # Color preview
-        self.color_preview = tk.Canvas(color_frame, width=30, height=20, bg='#0000FF', relief=tk.SUNKEN)
+        self.color_preview = tk.Canvas(color_frame, width=30, height=20, bg='#'+self.color_var.get()[1:]  , relief=tk.SUNKEN)
         self.color_preview.pack(side=tk.LEFT, padx=(0, 5))
         
         ttk.Button(color_frame, text="Pick Color", command=self.pick_color).pack(side=tk.LEFT)
@@ -188,11 +194,11 @@ class CrealityRFIDGUI:
         preset_frame.grid(row=row, column=1, sticky=tk.W, pady=5)
         
         for i, (name, code) in enumerate(list(self.color_presets.items())[:5]):
-            ttk.Button(preset_frame, text=name, width=8,
+            ttk.Button(preset_frame, text=name, width=8, 
                       command=lambda c=code: self.set_color(c)).grid(row=0, column=i, padx=2)
         
         for i, (name, code) in enumerate(list(self.color_presets.items())[5:]):
-            ttk.Button(preset_frame, text=name, width=8,
+            ttk.Button(preset_frame, text=name, width=8, 
                       command=lambda c=code: self.set_color(c)).grid(row=1, column=i, padx=2, pady=2)
         row += 1
         
