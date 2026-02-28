@@ -278,7 +278,7 @@ class CrealityRFIDGUI:
         output_label = ttk.Label(right_frame, text="Output:")
         output_label.pack(anchor=tk.W)
         
-        self.write_output = scrolledtext.ScrolledText(right_frame, height=20, width=50)
+        self.write_output = scrolledtext.ScrolledText(right_frame, height=20, width=50, font=('Monaco', 12))
         self.write_output.pack(fill=tk.BOTH, expand=True, pady=(5, 10))
         
         # Action buttons
@@ -363,7 +363,7 @@ class CrealityRFIDGUI:
                   command=lambda: self.ref_output.delete(1.0, tk.END)).pack(side=tk.LEFT, padx=5)
         
         # Output
-        self.ref_output = scrolledtext.ScrolledText(content, height=30, width=80, font=('Courier', 9))
+        self.ref_output = scrolledtext.ScrolledText(content, height=30, width=80, font=('Monaco', 12))
         self.ref_output.pack(fill=tk.BOTH, expand=True)
         
     def create_manual_tab(self):
@@ -401,7 +401,7 @@ class CrealityRFIDGUI:
         output_label = ttk.Label(content, text="Generated Commands:")
         output_label.pack(anchor=tk.W)
         
-        self.manual_output = scrolledtext.ScrolledText(content, height=25, width=80, font=('Courier', 9))
+        self.manual_output = scrolledtext.ScrolledText(content, height=25, width=80, font=('Monaco', 12))
         self.manual_output.pack(fill=tk.BOTH, expand=True, pady=(5, 10))
         
         # Buttons
