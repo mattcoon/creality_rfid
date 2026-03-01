@@ -18,6 +18,9 @@ class CrealityRFIDGUI:
         self.root.title("Creality RFID Tool")
         self.root.geometry("1524x720")
         
+        # Register validation function for decimal entries
+        self.decimal_validate_cmd = self.root.register(self.validate_decimal)
+        
         # Get script path
         self.script_path = self.find_script()
         
@@ -112,6 +115,16 @@ class CrealityRFIDGUI:
                 return True
             except:
                 return False
+    
+    def validate_decimal(self, value):
+        """Validate that the input is a decimal number"""
+        if value == "":
+            return True  # Allow empty string
+        try:
+            int(value)
+            return True
+        except ValueError:
+            return False
     
     def create_widgets(self):
         """Create all UI widgets"""
@@ -215,9 +228,25 @@ class CrealityRFIDGUI:
         row += 1
         
         # Serial number
+        # read serial number from file if it exists called searial.nr
+        # if the file exists, read the number, increment it by 1 and use that as the default value. If it doesn't exist, use 000001 as default value
+        serial_file = 'serial.nr'
+        if os.path.exists(serial_file):
+            try:
+                with open(serial_file, 'r') as f:
+                    serial_number = f.read().strip()
+                    if serial_number.isdigit():
+                        serial_number = int(serial_number) + 1
+                        self.serial_var = tk.StringVar(value=str(serial_number).zfill(6))
+                    else:
+                        self.serial_var = tk.StringVar(value='000001')
+            except:
+                self.serial_var = tk.StringVar(value='000001')
+
+        
         ttk.Label(left_frame, text="Serial Number:").grid(row=row, column=0, sticky=tk.W, pady=5)
-        self.serial_var = tk.StringVar(value='000001')
-        ttk.Entry(left_frame, textvariable=self.serial_var, width=15).grid(row=row, column=1, sticky=tk.W, pady=5)
+        ttk.Entry(left_frame, textvariable=self.serial_var, width=15,
+                 validate='key', validatecommand=(self.decimal_validate_cmd, '%P')).grid(row=row, column=1, sticky=tk.W, pady=5)
         row += 1
         
         # Separator
@@ -542,6 +571,14 @@ class CrealityRFIDGUI:
         
         # Run command
         self.run_command(args, self.write_output)
+
+        # After writing, save the new serial number back to serial.nr
+        serial_file = 'serial.nr'
+        try:
+            with open(serial_file, 'w') as f:
+                f.write(self.serial_var.get())
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save serial number: {str(e)}")
     
     def read_tag(self):
         """Read tag using pm3read command"""
