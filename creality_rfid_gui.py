@@ -299,6 +299,11 @@ class CrealityRFIDGUI:
         self.uid_entry.grid(row=row, column=1, sticky=tk.W, pady=5)
         row += 1
         
+        # add checkbox for read after write to verify the tag was written correctly
+        self.verify_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(left_frame, text="Read tag after writing to verify", 
+                       variable=self.verify_var).grid(row=row, column=0, columnspan=2, sticky=tk.W, pady=5)
+        row += 1
         # Right side - output and actions
         right_frame = ttk.Frame(content)
         right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
@@ -416,8 +421,9 @@ class CrealityRFIDGUI:
         input_frame.pack(fill=tk.X, pady=(0, 10))
         
         # UID input
+        UIDvalue = '3A14ACF1'
         ttk.Label(input_frame, text="UID:").grid(row=0, column=0, sticky=tk.W, pady=5)
-        self.manual_uid_input = tk.StringVar(value='3A14ACF1')
+        self.manual_uid_input = tk.StringVar(value=UIDvalue)
         ttk.Entry(input_frame, textvariable=self.manual_uid_input, width=20).grid(row=0, column=1, sticky=tk.W, pady=5)
         
         ttk.Button(input_frame, text="Generate Key", 
@@ -526,14 +532,16 @@ class CrealityRFIDGUI:
         thread.daemon = True
         thread.start()
     
-    def write_tag(self):
+    def write_tag(self, output_widget=None):
         """Write tag using pm3write command"""
+        if output_widget is None:
+            output_widget = self.write_output
         if not self.pm3_available:
             messagebox.showerror("Error", "Proxmark3 not detected!\n\nPlease ensure Proxmark3 is connected and 'pm3' command is available.")
             return
         
         # Clear output
-        self.write_output.delete(1.0, tk.END)
+        output_widget.delete(1.0, tk.END)
         
         # Build command
         args = ['pm3write']
@@ -570,8 +578,12 @@ class CrealityRFIDGUI:
             args.extend(['--skip-read', '--uid', self.uid_var.get()])
         
         # Run command
-        self.run_command(args, self.write_output)
+        self.run_command(args, output_widget)
 
+        # Verify tag if checkbox is checked
+        if self.verify_var.get():
+            self.read_tag(output_widget)
+        
         # After writing, save the new serial number back to serial.nr
         serial_file = 'serial.nr'
         try:
@@ -581,14 +593,16 @@ class CrealityRFIDGUI:
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save serial number: {str(e)}")
     
-    def read_tag(self):
+    def read_tag(self, output_widget=None):
         """Read tag using pm3read command"""
+        if output_widget is None:
+            output_widget = self.read_output
         if not self.pm3_available:
             messagebox.showerror("Error", "Proxmark3 not detected!\n\nPlease ensure Proxmark3 is connected and 'pm3' command is available.")
             return
         
         # Clear output
-        self.read_output.delete(1.0, tk.END)
+        output_widget.delete(1.0, tk.END)
         
         # Build command
         args = ['pm3read']
@@ -598,7 +612,7 @@ class CrealityRFIDGUI:
             args.extend(['--uid', self.read_uid_var.get()])
         
         # Run command
-        self.run_command(args, self.read_output)
+        self.run_command(args, output_widget)
     
     def show_reference(self, flag):
         """Show reference tables"""
