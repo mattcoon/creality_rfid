@@ -12,6 +12,8 @@ import threading
 import os
 import sys
 
+from matplotlib.pylab import f
+
 class CrealityRFIDGUI:
     def __init__(self, root):
         self.root = root
@@ -714,6 +716,10 @@ class CrealityRFIDGUI:
 def main():
     root = tk.Tk()
     app = CrealityRFIDGUI(root)
+    # add icon if available
+    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.png')
+    if os.path.exists(icon_path):
+        root.iconphoto(False, tk.PhotoImage(file=icon_path))
     root.mainloop()
 
 if __name__ == '__main__':
