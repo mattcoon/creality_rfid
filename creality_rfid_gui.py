@@ -577,6 +577,7 @@ class CrealityRFIDGUI:
         try:
             with open(serial_file, 'w') as f:
                 f.write(self.serial_var.get())
+            self.serial_var.set(str(int(self.serial_var.get()) + 1).zfill(6))  # Increment for next tag
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save serial number: {str(e)}")
     
